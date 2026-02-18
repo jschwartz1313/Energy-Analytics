@@ -13,4 +13,7 @@
 | Debt rate | 6.0% | Illustrative financing rate | 4.0%-9.0% |
 | Debt tenor (years) | 15 | Typical tenor | 10-20 |
 | Equity discount rate (WACC proxy) | 10.0% | Screening-level hurdle rate | 7.0%-14.0% |
+| Merchant basis discount | 0.92x | Accounts for basis/shape risk for merchant case | 0.80-1.00 |
+| Contracted price adder (USD/MWh) | +2.0 | Simplified premium for contracted structure | 0-10 |
+| Tax rate | 25.0% | Corporate tax proxy for after-tax view | 15%-30% |
 | Queue scenario | P50 / P90 | Completion-risk framing | P25-P90 (future) |

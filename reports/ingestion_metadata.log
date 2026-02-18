@@ -45,3 +45,102 @@
 [2026-02-18T21:04:41.045862Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg
 [2026-02-18T21:04:41.113270Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
 [2026-02-18T21:04:41.183816Z] qa:rows=72 failures=0 report=reports/qa_report.md
+[2026-02-18T21:11:19.098227Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:11:19.099859Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:11:19.101655Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:11:19.111981Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:11:19.112428Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:11:19.112535Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:11:19.127510Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:11:19.129016Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:11:19.132493Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:11:19.136693Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:11:19.139313Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:11:19.139429Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:11:19.389032Z] transform:panel rows=72 staged=data/staged/ercot_hourly_panel_staged.csv curated=data/curated/ercot_hourly_panel.csv
+[2026-02-18T21:11:19.555920Z] queue_transform:normalized_rows=12 outlook_rows=11 empirical_tech_rates={'wind': 0.3333}
+[2026-02-18T21:11:19.693661Z] markets:hours=72 solar_capture=36.460 wind_capture=36.729 negative_hours=0
+[2026-02-18T21:11:19.799592Z] finance:scenarios=9 base_npv_musd=-36.377 base_irr=-0.008
+[2026-02-18T21:11:19.911259Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg
+[2026-02-18T21:11:20.033401Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
+[2026-02-18T21:11:20.137228Z] qa:rows=72 failures=0 report=reports/qa_report.md
+[2026-02-18T21:17:51.667199Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:17:51.668894Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:17:51.670503Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:17:51.673607Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:17:51.674398Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:17:51.674585Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:17:51.693255Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:17:51.694774Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:17:51.696065Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:17:51.698921Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:17:51.699416Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:17:51.699523Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:17:51.787565Z] transform:panel rows=72 staged=data/staged/ercot_hourly_panel_staged.csv curated=data/curated/ercot_hourly_panel.csv
+[2026-02-18T21:17:51.882260Z] forecast:backtest_rows=48 naive_rmse=0.00 weather_rmse=1799.04
+[2026-02-18T21:17:51.976478Z] queue_transform:normalized_rows=12 outlook_rows=11 calibration_rows=3 empirical_tech_rates={'wind': 0.3333}
+[2026-02-18T21:17:52.072437Z] markets:hours=72 solar_capture=36.460 wind_capture=36.729 negative_hours=0
+[2026-02-18T21:17:52.173022Z] finance:scenarios=18 base_npv_musd=-32.045 base_after_tax_npv_musd=-35.533 base_irr=0.006
+[2026-02-18T21:17:52.267847Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg reports/charts/ercot_load_forecast_scenarios.svg
+[2026-02-18T21:17:52.363221Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
+[2026-02-18T21:17:52.462781Z] qa:rows=72 failures=5 report=reports/qa_report.md
+[2026-02-18T21:18:14.762935Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:18:14.764701Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:18:14.766297Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:18:14.769475Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:18:14.770011Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:18:14.770166Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:18:14.823015Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:18:14.826535Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:18:14.828766Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:18:14.832413Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:18:14.833161Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:18:14.833371Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:18:14.894260Z] transform:panel rows=72 staged=data/staged/ercot_hourly_panel_staged.csv curated=data/curated/ercot_hourly_panel.csv
+[2026-02-18T21:18:14.989585Z] forecast:backtest_rows=48 naive_rmse=0.00 weather_rmse=1799.04
+[2026-02-18T21:18:15.097553Z] queue_transform:normalized_rows=12 outlook_rows=11 calibration_rows=3 empirical_tech_rates={'wind': 0.3333}
+[2026-02-18T21:18:15.196200Z] markets:hours=72 solar_capture=36.460 wind_capture=36.729 negative_hours=0
+[2026-02-18T21:18:15.296726Z] finance:scenarios=18 base_npv_musd=-32.045 base_after_tax_npv_musd=-35.533 base_irr=0.006
+[2026-02-18T21:18:15.389652Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg reports/charts/ercot_load_forecast_scenarios.svg
+[2026-02-18T21:18:15.483378Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
+[2026-02-18T21:18:15.577146Z] qa:rows=72 failures=13 report=reports/qa_report.md
+[2026-02-18T21:18:40.005990Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:18:40.007706Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:18:40.008622Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:18:40.009316Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:18:40.010723Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:18:40.012352Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:18:40.012590Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:18:40.012826Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:18:40.012938Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:18:40.015767Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:18:40.016487Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:18:40.016682Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:18:40.129602Z] transform:panel rows=72 staged=data/staged/ercot_hourly_panel_staged.csv curated=data/curated/ercot_hourly_panel.csv
+[2026-02-18T21:18:40.233325Z] forecast:backtest_rows=48 naive_rmse=0.00 weather_rmse=1799.04
+[2026-02-18T21:18:40.332284Z] queue_transform:normalized_rows=12 outlook_rows=11 calibration_rows=3 empirical_tech_rates={'wind': 0.3333}
+[2026-02-18T21:18:40.433633Z] markets:hours=72 solar_capture=36.460 wind_capture=36.729 negative_hours=0
+[2026-02-18T21:18:40.539166Z] finance:scenarios=18 base_npv_musd=-32.045 base_after_tax_npv_musd=-35.533 base_irr=0.006
+[2026-02-18T21:18:40.638861Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg reports/charts/ercot_load_forecast_scenarios.svg
+[2026-02-18T21:18:40.745099Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
+[2026-02-18T21:18:40.848848Z] qa:rows=72 failures=0 report=reports/qa_report.md
+[2026-02-18T21:22:39.770860Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:22:39.772446Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:22:39.773923Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:22:39.776971Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:22:39.777705Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:22:39.777893Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:22:39.803070Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:22:39.804716Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:22:39.806323Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:22:39.809447Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:22:39.809971Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:22:39.810094Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:22:39.895545Z] transform:panel rows=72 staged=data/staged/ercot_hourly_panel_staged.csv curated=data/curated/ercot_hourly_panel.csv
+[2026-02-18T21:22:40.000921Z] forecast:backtest_rows=48 naive_rmse=0.00 weather_rmse=1799.04
+[2026-02-18T21:22:40.098407Z] queue_transform:normalized_rows=12 outlook_rows=11 calibration_rows=3 empirical_tech_rates={'wind': 0.3333}
+[2026-02-18T21:22:40.218084Z] markets:hours=72 solar_capture=36.460 wind_capture=36.729 negative_hours=0
+[2026-02-18T21:22:40.330091Z] finance:scenarios=18 base_npv_musd=-32.045 base_after_tax_npv_musd=-35.533 base_irr=0.006
+[2026-02-18T21:22:40.432903Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg reports/charts/ercot_load_forecast_scenarios.svg
+[2026-02-18T21:22:40.534895Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
+[2026-02-18T21:22:40.633173Z] qa:rows=72 failures=0 report=reports/qa_report.md

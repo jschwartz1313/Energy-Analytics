@@ -18,8 +18,8 @@ class DashboardTests(unittest.TestCase):
             }
         ]
         idx = _scenario_index(rows)
-        self.assertIn("base|base", idx)
-        self.assertAlmostEqual(idx["base|base"]["npv_musd"], 1.2)
+        self.assertIn("contracted|base|base", idx)
+        self.assertAlmostEqual(idx["contracted|base|base"]["npv_musd"], 1.2)
 
 
 if __name__ == "__main__":

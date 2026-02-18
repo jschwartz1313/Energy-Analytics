@@ -32,11 +32,36 @@
 - `metric`: Metric name.
 - `value`: Metric numeric value.
 
+## `data/marts/ercot_load_backtest.csv`
+- `timestamp_utc`: Backtest evaluation timestamp.
+- `actual_load_mw`: Observed load.
+- `naive_forecast_mw`: 24-hour lag baseline forecast.
+- `weather_forecast_mw`: Temperature-based linear forecast.
+- `naive_abs_pct_error`: Absolute percentage error for naive model.
+- `weather_abs_pct_error`: Absolute percentage error for weather model.
+
+## `data/marts/ercot_load_forecast_scenarios.csv`
+- `scenario`: `low`, `base`, or `high`.
+- `year`: Projection year.
+- `avg_load_mw`: Projected annual average load.
+- `peak_load_mw`: Projected annual peak proxy.
+- `annual_growth_rate`: Scenario growth assumption.
+
+## `data/marts/ercot_queue_calibration.csv`
+- `technology`: Canonical technology bucket.
+- `historical_projects`: Count of historical terminal-status projects.
+- `historical_operational_projects`: Count with operational outcome.
+- `observed_completion_rate`: Observed operational share.
+- `mean_predicted_probability`: Mean modeled probability.
+- `brier_score`: Mean squared probabilistic error.
+
 ## `data/marts/ercot_finance_scenarios.csv`
 - `scenario_id`: Scenario sequence id.
+- `contract_type`: `merchant` or `contracted`.
 - `price_case`: `low`, `base`, or `high`.
 - `capex_case`: `low`, `base`, or `high`.
 - `npv_musd`: Equity NPV in million USD.
+- `after_tax_npv_musd`: After-tax equity NPV in million USD.
 - `irr`: Internal rate of return.
 - `min_dscr`: Minimum DSCR over debt tenor.
 - `avg_dscr`: Average DSCR over debt tenor.

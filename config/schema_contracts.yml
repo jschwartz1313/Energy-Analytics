@@ -1,0 +1,49 @@
+load:
+  required_columns:
+    - timestamp_utc
+    - region
+    - load_mw
+  column_types:
+    timestamp_utc: datetime
+    region: string
+    load_mw: float
+
+price:
+  required_columns:
+    - timestamp_utc
+    - region
+    - hub
+    - price_usd_mwh
+  column_types:
+    timestamp_utc: datetime
+    region: string
+    hub: string
+    price_usd_mwh: float
+
+weather:
+  required_columns:
+    - timestamp_utc
+    - region
+    - temperature_f
+  column_types:
+    timestamp_utc: datetime
+    region: string
+    temperature_f: float
+
+queue:
+  required_columns:
+    - queue_id
+    - project_name
+    - technology_raw
+    - mw
+    - status_raw
+    - queue_date
+    - target_cod
+  column_types:
+    queue_id: string
+    project_name: string
+    technology_raw: string
+    mw: float
+    status_raw: string
+    queue_date: date
+    target_cod: date

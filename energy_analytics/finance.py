@@ -8,11 +8,13 @@ from energy_analytics.metadata import log_metadata
 
 SCENARIO_COLUMNS = [
     "scenario_id",
+    "contract_type",
     "price_case",
     "capex_case",
     "price_multiplier",
     "capex_multiplier",
     "npv_musd",
+    "after_tax_npv_musd",
     "irr",
     "min_dscr",
     "avg_dscr",
@@ -72,6 +74,7 @@ def _build_case(
     assumptions: dict[str, float],
     price_multiplier: float,
     capex_multiplier: float,
+    contract_type: str,
 ) -> dict[str, float]:
     life = int(assumptions["project_life_years"])
     debt_tenor = int(assumptions["debt_tenor_years"])
@@ -83,6 +86,9 @@ def _build_case(
     debt_fraction = float(assumptions["debt_fraction"])
     debt_rate = float(assumptions["debt_rate"])
     discount = float(assumptions["equity_discount_rate"])
+    tax_rate = float(assumptions.get("tax_rate", 0.25))
+    merchant_discount = float(assumptions.get("merchant_basis_discount", 0.92))
+    contracted_adder = float(assumptions.get("contracted_price_adder_usd_mwh", 2.0))
 
     capacity_kw = capacity_mw * 1000.0
     capex = capacity_kw * capex_kw
@@ -91,10 +97,14 @@ def _build_case(
     annual_debt_service = _annuity_payment(debt, debt_rate, debt_tenor)
 
     annual_energy = capacity_mw * 8760.0 * cap_factor
-    strike_price = base_capture * price_multiplier
+    if contract_type == "contracted":
+        strike_price = (base_capture * price_multiplier) + contracted_adder
+    else:
+        strike_price = (base_capture * price_multiplier) * merchant_discount
 
     cfads: list[float] = []
     equity_cfs = [-equity]
+    equity_cfs_after_tax = [-equity]
     debt_dscr: list[float] = []
     discounted_cost = capex
     discounted_energy = 0.0
@@ -108,6 +118,7 @@ def _build_case(
 
         debt_service = annual_debt_service if year <= debt_tenor else 0.0
         equity_cfs.append(cash - debt_service)
+        equity_cfs_after_tax.append((cash - debt_service) * (1 - tax_rate))
 
         if debt_service > 0:
             debt_dscr.append(cash / debt_service)
@@ -116,6 +127,7 @@ def _build_case(
         discounted_energy += energy / ((1 + discount) ** year)
 
     npv_equity = _npv(discount, equity_cfs)
+    npv_equity_after_tax = _npv(discount, equity_cfs_after_tax)
     irr_equity = _irr(equity_cfs)
     min_dscr = min(debt_dscr) if debt_dscr else 0.0
     avg_dscr = sum(debt_dscr) / len(debt_dscr) if debt_dscr else 0.0
@@ -123,6 +135,7 @@ def _build_case(
 
     return {
         "npv": npv_equity,
+        "after_tax_npv": npv_equity_after_tax,
         "irr": irr_equity,
         "min_dscr": min_dscr,
         "avg_dscr": avg_dscr,
@@ -174,33 +187,38 @@ def run_finance() -> None:
 
     price_cases = [("low", 0.85), ("base", 1.00), ("high", 1.15)]
     capex_cases = [("low", 0.90), ("base", 1.00), ("high", 1.10)]
+    contract_cases = ["merchant", "contracted"]
 
     scenario_rows: list[dict[str, str]] = []
     scenario_id = 1
     base_npv_musd = 0.0
 
-    for price_name, price_mult in price_cases:
-        for capex_name, capex_mult in capex_cases:
-            r = _build_case(base_capture, assumptions, price_mult, capex_mult)
-            npv_musd = r["npv"] / 1_000_000.0
-            if price_name == "base" and capex_name == "base":
-                base_npv_musd = npv_musd
-            scenario_rows.append(
-                {
-                    "scenario_id": str(scenario_id),
-                    "price_case": price_name,
-                    "capex_case": capex_name,
-                    "price_multiplier": f"{price_mult:.2f}",
-                    "capex_multiplier": f"{capex_mult:.2f}",
-                    "npv_musd": f"{npv_musd:.4f}",
-                    "irr": f"{r['irr']:.4f}",
-                    "min_dscr": f"{r['min_dscr']:.4f}",
-                    "avg_dscr": f"{r['avg_dscr']:.4f}",
-                    "lcoe_usd_mwh": f"{r['lcoe']:.4f}",
-                    "year1_revenue_musd": f"{(r['year1_revenue'] / 1_000_000.0):.4f}",
-                }
-            )
-            scenario_id += 1
+    for contract_type in contract_cases:
+        for price_name, price_mult in price_cases:
+            for capex_name, capex_mult in capex_cases:
+                r = _build_case(base_capture, assumptions, price_mult, capex_mult, contract_type=contract_type)
+                npv_musd = r["npv"] / 1_000_000.0
+                after_tax_npv_musd = r["after_tax_npv"] / 1_000_000.0
+                if contract_type == "contracted" and price_name == "base" and capex_name == "base":
+                    base_npv_musd = npv_musd
+                scenario_rows.append(
+                    {
+                        "scenario_id": str(scenario_id),
+                        "contract_type": contract_type,
+                        "price_case": price_name,
+                        "capex_case": capex_name,
+                        "price_multiplier": f"{price_mult:.2f}",
+                        "capex_multiplier": f"{capex_mult:.2f}",
+                        "npv_musd": f"{npv_musd:.4f}",
+                        "after_tax_npv_musd": f"{after_tax_npv_musd:.4f}",
+                        "irr": f"{r['irr']:.4f}",
+                        "min_dscr": f"{r['min_dscr']:.4f}",
+                        "avg_dscr": f"{r['avg_dscr']:.4f}",
+                        "lcoe_usd_mwh": f"{r['lcoe']:.4f}",
+                        "year1_revenue_musd": f"{(r['year1_revenue'] / 1_000_000.0):.4f}",
+                    }
+                )
+                scenario_id += 1
 
     scenarios_path.parent.mkdir(parents=True, exist_ok=True)
     with scenarios_path.open("w", encoding="utf-8", newline="") as f:
@@ -208,12 +226,18 @@ def run_finance() -> None:
         writer.writeheader()
         writer.writerows(scenario_rows)
 
-    base_row = next(r for r in scenario_rows if r["price_case"] == "base" and r["capex_case"] == "base")
+    base_row = next(
+        r
+        for r in scenario_rows
+        if r["contract_type"] == "contracted" and r["price_case"] == "base" and r["capex_case"] == "base"
+    )
     with summary_path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["metric", "value"])
         writer.writeheader()
         writer.writerow({"metric": "base_solar_capture_price_usd_mwh", "value": f"{base_capture:.4f}"})
+        writer.writerow({"metric": "base_contract_type", "value": "contracted"})
         writer.writerow({"metric": "base_npv_musd", "value": base_row["npv_musd"]})
+        writer.writerow({"metric": "base_after_tax_npv_musd", "value": base_row["after_tax_npv_musd"]})
         writer.writerow({"metric": "base_irr", "value": base_row["irr"]})
         writer.writerow({"metric": "base_min_dscr", "value": base_row["min_dscr"]})
         writer.writerow({"metric": "base_lcoe_usd_mwh", "value": base_row["lcoe_usd_mwh"]})
@@ -227,7 +251,7 @@ def run_finance() -> None:
     ]
     sensitivity_rows: list[dict[str, str]] = []
     for name, p_mult, c_mult in sens_inputs:
-        r = _build_case(base_capture, assumptions, p_mult, c_mult)
+        r = _build_case(base_capture, assumptions, p_mult, c_mult, contract_type="contracted")
         npv_musd = r["npv"] / 1_000_000.0
         sensitivity_rows.append(
             {
@@ -251,6 +275,7 @@ def run_finance() -> None:
             "finance:"
             f"scenarios={len(scenario_rows)} "
             f"base_npv_musd={base_npv_musd:.3f} "
+            f"base_after_tax_npv_musd={float(base_row['after_tax_npv_musd']):.3f} "
             f"base_irr={float(base_row['irr']):.3f}"
         ),
     )

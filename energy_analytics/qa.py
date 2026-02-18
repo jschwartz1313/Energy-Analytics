@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 from energy_analytics.config import load_config
@@ -46,9 +47,11 @@ MARKETS_METRIC_REQUIRED = {
 
 FINANCE_SCENARIO_REQUIRED_COLUMNS = {
     "scenario_id",
+    "contract_type",
     "price_case",
     "capex_case",
     "npv_musd",
+    "after_tax_npv_musd",
     "irr",
     "min_dscr",
     "avg_dscr",
@@ -61,12 +64,17 @@ def run_qa() -> None:
     panel_path = Path(cfg["curated_output"]["panel_csv"])
     queue_path = Path(cfg["staged_output"]["queue_csv"])
     queue_outlook_path = Path(cfg["curated_output"]["queue_outlook_csv"])
+    queue_calibration_path = Path(cfg["queue_model_output"]["calibration_csv"])
+    forecast_backtest_path = Path(cfg["forecast_output"]["backtest_csv"])
+    forecast_metrics_path = Path(cfg["forecast_output"]["backtest_metrics_csv"])
+    forecast_scenarios_path = Path(cfg["forecast_output"]["scenarios_csv"])
     markets_metrics_path = Path(cfg["markets_output"]["metrics_csv"])
     findings_path = Path(cfg["markets_output"]["findings_md"])
     finance_scenarios_path = Path(cfg["finance_output"]["scenarios_csv"])
     finance_summary_path = Path(cfg["finance_output"]["summary_csv"])
     dashboard_path = Path("reports/dashboard/index.html")
     summary_report_path = Path("reports/dashboard/summary_report.html")
+    ingest_manifest_path = Path(cfg.get("ingestion", {}).get("manifest_output", "reports/ingestion_manifest.json"))
     report_path = Path(cfg["reports"]["qa_report"])
     log_path = cfg["reports"]["metadata_log"]
 
@@ -161,6 +169,40 @@ def run_qa() -> None:
         if p90_mw > p50_mw:
             failures.append(f"Queue outlook row {i}: expected p90 MW cannot exceed p50 MW")
 
+    calibration_rows: list[dict[str, str]] = []
+    with queue_calibration_path.open("r", encoding="utf-8", newline="") as f:
+        calibration_rows = list(csv.DictReader(f))
+    for i, row in enumerate(calibration_rows, start=1):
+        try:
+            obs = float(row["observed_completion_rate"])
+            pred = float(row["mean_predicted_probability"])
+            brier = float(row["brier_score"])
+        except (ValueError, KeyError):
+            failures.append(f"Queue calibration row {i}: parse failure")
+            continue
+        if not (0.0 <= obs <= 1.0 and 0.0 <= pred <= 1.0):
+            failures.append(f"Queue calibration row {i}: rates must be in [0,1]")
+        if brier < 0:
+            failures.append(f"Queue calibration row {i}: brier score must be >= 0")
+
+    with forecast_backtest_path.open("r", encoding="utf-8", newline="") as f:
+        forecast_backtest_rows = list(csv.DictReader(f))
+    if len(forecast_backtest_rows) < 10:
+        failures.append("Forecast backtest has too few rows")
+
+    forecast_metrics: dict[str, str] = {}
+    with forecast_metrics_path.open("r", encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            forecast_metrics[row["metric"]] = row["value"]
+    for req in ("naive_rmse_mw", "weather_rmse_mw", "naive_mape", "weather_mape", "best_model"):
+        if req not in forecast_metrics:
+            failures.append(f"Forecast metric missing: {req}")
+
+    with forecast_scenarios_path.open("r", encoding="utf-8", newline="") as f:
+        forecast_scen_rows = list(csv.DictReader(f))
+    if len(forecast_scen_rows) < 15:
+        failures.append("Forecast scenarios table should contain at least 15 rows")
+
     market_metrics: dict[str, float] = {}
     with markets_metrics_path.open("r", encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
@@ -197,12 +239,13 @@ def run_qa() -> None:
         for row in reader:
             finance_rows.append(row)
 
-    if len(finance_rows) < 9:
-        failures.append("Finance scenario matrix should contain at least 9 rows")
+    if len(finance_rows) < 18:
+        failures.append("Finance scenario matrix should contain at least 18 rows")
 
     for i, row in enumerate(finance_rows, start=1):
         try:
             float(row["npv_musd"])
+            float(row["after_tax_npv_musd"])
             float(row["irr"])
             min_dscr = float(row["min_dscr"])
             avg_dscr = float(row["avg_dscr"])
@@ -213,10 +256,29 @@ def run_qa() -> None:
         if min_dscr > avg_dscr:
             failures.append(f"Finance scenario row {i}: min_dscr cannot exceed avg_dscr")
 
+    contract_types = {row["contract_type"] for row in finance_rows if "contract_type" in row}
+    if {"merchant", "contracted"} - contract_types:
+        failures.append("Finance scenario matrix must include merchant and contracted contract types")
+
     with finance_summary_path.open("r", encoding="utf-8", newline="") as f:
         summary_rows = list(csv.DictReader(f))
     if not summary_rows:
         failures.append("Finance summary table has zero rows")
+
+    manifest_records_count = 0
+    if not ingest_manifest_path.exists():
+        failures.append(f"Ingestion manifest missing: {ingest_manifest_path}")
+    else:
+        payload = json.loads(ingest_manifest_path.read_text(encoding="utf-8"))
+        recs = payload.get("records", [])
+        manifest_records_count = len(recs)
+        if manifest_records_count < 4:
+            failures.append("Ingestion manifest must contain 4 dataset records")
+        for rec in recs:
+            if not rec.get("contract_valid", False):
+                failures.append(f"Contract invalid in manifest for dataset={rec.get('dataset')}")
+            if not rec.get("sha256"):
+                failures.append(f"Missing sha256 in manifest for dataset={rec.get('dataset')}")
 
     for path, label in (
         (dashboard_path, "Dashboard index"),
@@ -242,8 +304,12 @@ def run_qa() -> None:
         f.write(f"- Panel rows checked: {len(rows)}\n")
         f.write(f"- Queue rows checked: {len(queue_rows)}\n")
         f.write(f"- Queue outlook rows checked: {len(outlook_rows)}\n")
+        f.write(f"- Queue calibration rows checked: {len(calibration_rows)}\n")
+        f.write(f"- Forecast backtest rows checked: {len(forecast_backtest_rows)}\n")
+        f.write(f"- Forecast scenario rows checked: {len(forecast_scen_rows)}\n")
         f.write(f"- Market metrics checked: {len(market_metrics)}\n")
         f.write(f"- Finance scenarios checked: {len(finance_rows)}\n")
+        f.write(f"- Ingestion manifest records: {manifest_records_count}\n")
         f.write(f"- Dashboard artifacts checked: 2\n")
         f.write(f"- Unique timestamps: {len(set(timestamps))}\n")
         f.write(f"- Result: {'FAIL' if failures else 'PASS'}\n\n")

@@ -32,6 +32,15 @@ OUTLOOK_COLUMNS = [
     "expected_online_mw_p90",
 ]
 
+CALIBRATION_COLUMNS = [
+    "technology",
+    "historical_projects",
+    "historical_operational_projects",
+    "observed_completion_rate",
+    "mean_predicted_probability",
+    "brier_score",
+]
+
 HEURISTIC_STATUS_PROB = {
     "operational": 1.00,
     "under_construction": 0.85,
@@ -102,11 +111,54 @@ def _infer_tech_completion_rates(rows: list[dict[str, str]]) -> dict[str, float]
     return rates
 
 
+def _calibration_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    current_year = datetime.now(timezone.utc).year
+    bucket: dict[str, dict[str, float]] = defaultdict(
+        lambda: {
+            "n": 0.0,
+            "observed": 0.0,
+            "pred_sum": 0.0,
+            "brier_sum": 0.0,
+        }
+    )
+
+    for row in rows:
+        year = int(row["target_cod_year"])
+        status = row["status"]
+        if year >= current_year or status not in TERMINAL_STATUS:
+            continue
+        tech = row["technology"]
+        pred = float(row["completion_probability_p50"])
+        obs = 1.0 if status == "operational" else 0.0
+
+        b = bucket[tech]
+        b["n"] += 1.0
+        b["observed"] += obs
+        b["pred_sum"] += pred
+        b["brier_sum"] += (pred - obs) ** 2
+
+    out: list[dict[str, str]] = []
+    for tech, b in sorted(bucket.items()):
+        n = b["n"]
+        out.append(
+            {
+                "technology": tech,
+                "historical_projects": str(int(n)),
+                "historical_operational_projects": str(int(b["observed"])),
+                "observed_completion_rate": f"{(b['observed']/n if n else 0.0):.4f}",
+                "mean_predicted_probability": f"{(b['pred_sum']/n if n else 0.0):.4f}",
+                "brier_score": f"{(b['brier_sum']/n if n else 0.0):.4f}",
+            }
+        )
+    return out
+
+
 def run_queue_transform() -> None:
     cfg = load_config()
     raw_path = Path(cfg["raw_output"]["queue"])
     staged_path = Path(cfg["staged_output"]["queue_csv"])
     outlook_path = Path(cfg["curated_output"]["queue_outlook_csv"])
+    calibration_path = Path(cfg["queue_model_output"]["calibration_csv"])
     log_path = cfg["reports"]["metadata_log"]
 
     normalized_rows: list[dict[str, str]] = []
@@ -198,12 +250,20 @@ def run_queue_transform() -> None:
         writer.writeheader()
         writer.writerows(outlook_rows)
 
+    calibration_rows = _calibration_rows(normalized_rows)
+    calibration_path.parent.mkdir(parents=True, exist_ok=True)
+    with calibration_path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CALIBRATION_COLUMNS)
+        writer.writeheader()
+        writer.writerows(calibration_rows)
+
     log_metadata(
         log_path,
         (
             "queue_transform:"
             f"normalized_rows={len(normalized_rows)} "
             f"outlook_rows={len(outlook_rows)} "
+            f"calibration_rows={len(calibration_rows)} "
             f"empirical_tech_rates={tech_rates}"
         ),
     )

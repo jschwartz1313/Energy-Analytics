@@ -1,6 +1,33 @@
 region: ERCOT
 timezone: UTC
 hub: HB_NORTH
+ingestion:
+  mode: sample
+  allow_real_to_sample_fallback: true
+  enforce_contracts: true
+  contracts_path: config/schema_contracts.yml
+  manifest_output: reports/ingestion_manifest.json
+  raw_snapshot_dir: data/raw/snapshots
+real_data:
+  load:
+    source_type: url_csv
+    url: https://www.ercot.com/api/1/services/read/dashboards/loadForecast?format=csv
+  price:
+    source_type: url_csv
+    url: https://www.ercot.com/api/1/services/read/dashboards/daLmp?format=csv
+  weather:
+    source_type: open_meteo_archive
+    url: https://archive-api.open-meteo.com/v1/archive
+    latitude: 30.2672
+    longitude: -97.7431
+    start_date: 2025-01-01
+    end_date: 2025-01-03
+    timezone: UTC
+    hourly: temperature_2m
+    temperature_unit: fahrenheit
+  queue:
+    source_type: url_csv
+    url: https://www.ercot.com/files/docs/2024/01/02/GI_Queue_Report.csv
 sample_data:
   load: data/samples/ercot_load_sample.csv
   price: data/samples/ercot_price_sample.csv
@@ -18,10 +45,16 @@ curated_output:
   panel_csv: data/curated/ercot_hourly_panel.csv
   panel_parquet: data/curated/ercot_hourly_panel.parquet
   queue_outlook_csv: data/curated/ercot_queue_expected_online_mw.csv
+forecast_output:
+  backtest_csv: data/marts/ercot_load_backtest.csv
+  backtest_metrics_csv: data/marts/ercot_load_backtest_metrics.csv
+  scenarios_csv: data/marts/ercot_load_forecast_scenarios.csv
 markets_output:
   metrics_csv: data/marts/ercot_market_metrics.csv
   hourly_csv: data/marts/ercot_market_hourly_enriched.csv
   findings_md: reports/market_findings.md
+queue_model_output:
+  calibration_csv: data/marts/ercot_queue_calibration.csv
 finance_output:
   scenarios_csv: data/marts/ercot_finance_scenarios.csv
   summary_csv: data/marts/ercot_finance_summary.csv
@@ -38,6 +71,9 @@ finance_assumptions:
   debt_rate: 0.06
   debt_tenor_years: 15
   equity_discount_rate: 0.10
+  merchant_basis_discount: 0.92
+  contracted_price_adder_usd_mwh: 2.0
+  tax_rate: 0.25
 reports:
   qa_report: reports/qa_report.md
   metadata_log: reports/ingestion_metadata.log

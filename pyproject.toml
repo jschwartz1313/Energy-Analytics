@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "energy-analytics"
 version = "0.1.0"
-description = "Milestone 1 pipeline for regional energy load/price/weather analytics"
+description = "Energy analytics portfolio pipeline with ingestion, forecasting, markets, finance, and dashboard outputs"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -18,3 +18,15 @@ packages = ["energy_analytics"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.black]
+line-length = 120
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]

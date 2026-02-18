@@ -1,14 +1,23 @@
 PYTHON ?= python3
 
-.PHONY: all ingest transform queue markets finance charts dashboard qa clean test
+.PHONY: all ingest ingest-real ingest-hybrid transform forecast queue markets finance charts dashboard qa clean test
 
-all: ingest transform queue markets finance charts dashboard qa
+all: ingest transform forecast queue markets finance charts dashboard qa
 
 ingest:
 	$(PYTHON) -m energy_analytics ingest
 
+ingest-real:
+	$(PYTHON) -m energy_analytics ingest-real
+
+ingest-hybrid:
+	$(PYTHON) -m energy_analytics ingest-hybrid
+
 transform:
 	$(PYTHON) -m energy_analytics transform
+
+forecast:
+	$(PYTHON) -m energy_analytics forecast
 
 queue:
 	$(PYTHON) -m energy_analytics queue

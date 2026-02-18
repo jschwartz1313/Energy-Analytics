@@ -24,9 +24,11 @@ def _metric_map(rows: list[dict[str, str]]) -> dict[str, float]:
 def _scenario_index(rows: list[dict[str, str]]) -> dict[str, dict[str, float]]:
     idx: dict[str, dict[str, float]] = {}
     for row in rows:
-        key = f"{row['price_case']}|{row['capex_case']}"
+        contract_type = row.get("contract_type", "contracted")
+        key = f"{contract_type}|{row['price_case']}|{row['capex_case']}"
         idx[key] = {
             "npv_musd": float(row["npv_musd"]),
+            "after_tax_npv_musd": float(row.get("after_tax_npv_musd", row["npv_musd"])),
             "irr": float(row["irr"]),
             "min_dscr": float(row["min_dscr"]),
             "avg_dscr": float(row["avg_dscr"]),
@@ -69,6 +71,7 @@ def _build_summary_report(cfg: dict[str, Any], metrics: dict[str, float], base_f
   <table>
     <tr><th>Metric</th><th>Value</th></tr>
     <tr><td>NPV (MUSD)</td><td>{base_fin['npv_musd']:.2f}</td></tr>
+    <tr><td>After-tax NPV (MUSD)</td><td>{base_fin.get('after_tax_npv_musd', base_fin['npv_musd']):.2f}</td></tr>
     <tr><td>IRR</td><td>{base_fin['irr']:.3f}</td></tr>
     <tr><td>Min DSCR</td><td>{base_fin['min_dscr']:.3f}</td></tr>
     <tr><td>LCOE (USD/MWh)</td><td>{base_fin['lcoe_usd_mwh']:.2f}</td></tr>
@@ -116,7 +119,7 @@ def run_dashboard() -> None:
     queue_p50 = [queue_by_year[y]["p50"] for y in years]
     queue_p90 = [queue_by_year[y]["p90"] for y in years]
 
-    base_fin = scenario_idx["base|base"]
+    base_fin = scenario_idx["contracted|base|base"]
     summary_report_path = _build_summary_report(cfg, market_metrics, base_fin)
 
     embedded = {
@@ -213,6 +216,8 @@ def run_dashboard() -> None:
       <input id='wacc' type='number' value='{cfg['finance_assumptions']['equity_discount_rate']}' step='0.005'>
       <label title='Debt interest rate assumption.'>Debt rate</label>
       <input id='debt' type='number' value='{cfg['finance_assumptions']['debt_rate']}' step='0.005'>
+      <label title='Revenue structure for the project case.'>Contract type</label>
+      <select id='contract_type'><option value='contracted' selected>Contracted</option><option value='merchant'>Merchant</option></select>
       <label title='Power purchase agreement proxy price.'>PPA price (USD/MWh)</label>
       <input id='ppa' type='number' value='{market_metrics.get('solar_capture_price_usd_mwh',0.0):.2f}' step='0.5'>
       <label title='Annual energy degradation assumption.'>Degradation</label>
@@ -242,6 +247,7 @@ def run_dashboard() -> None:
       <h3>Load and Weather</h3>
       <img class='chart' src='../charts/ercot_load.svg' alt='Hourly load chart (MW)'>
       <img class='chart' src='../charts/ercot_temperature.svg' alt='Hourly temperature chart (F)'>
+      <img class='chart' src='../charts/ercot_load_forecast_scenarios.svg' alt='Load forecast scenarios chart (avg MW)'>
       <div class='foot'>Units: MW for load, F for temperature.</div>
     </section>
 
@@ -278,8 +284,11 @@ def run_dashboard() -> None:
       <h3>Downloads and Report</h3>
       <div class='dl'>
         <a href='../../data/marts/ercot_market_metrics.csv' download>Download market metrics CSV</a>
+        <a href='../../data/marts/ercot_load_backtest.csv' download>Download load backtest CSV</a>
+        <a href='../../data/marts/ercot_load_forecast_scenarios.csv' download>Download load scenarios CSV</a>
         <a href='../../data/marts/ercot_finance_scenarios.csv' download>Download finance scenarios CSV</a>
         <a href='../../data/marts/ercot_finance_sensitivity.csv' download>Download finance sensitivity CSV</a>
+        <a href='../../data/marts/ercot_queue_calibration.csv' download>Download queue calibration CSV</a>
         <a href='../../data/curated/ercot_queue_expected_online_mw.csv' download>Download queue outlook CSV</a>
         <a href='summary_report.html' target='_blank'>Open auto-generated summary report</a>
       </div>
@@ -294,6 +303,7 @@ const DATA = {json.dumps(embedded)};
 function fmt(n, d=2) {{ return Number(n).toFixed(d); }}
 function scenarioKeyFromControls() {{
   const price = document.getElementById('tight_scn').value;
+  const contractType = document.getElementById('contract_type').value;
   const capex = Number(document.getElementById('capex').value);
   const baseCapex = {cfg['finance_assumptions']['capex_per_kw']};
   let priceCase = 'base';
@@ -302,7 +312,7 @@ function scenarioKeyFromControls() {{
   let capexCase = 'base';
   if (capex < baseCapex) capexCase = 'low';
   if (capex > baseCapex) capexCase = 'high';
-  return priceCase + '|' + capexCase;
+  return contractType + '|' + priceCase + '|' + capexCase;
 }}
 
 function refresh() {{
@@ -327,7 +337,7 @@ function refresh() {{
   document.getElementById('k_queue_total').textContent = fmt(qTotal, 1);
 
   const key = scenarioKeyFromControls();
-  const s = DATA.finance_scenarios[key] || DATA.finance_scenarios['base|base'];
+  const s = DATA.finance_scenarios[key] || DATA.finance_scenarios['contracted|base|base'];
   document.getElementById('k_npv').textContent = fmt(s.npv_musd, 2);
   document.getElementById('k_irr').textContent = fmt(s.irr, 3);
   document.getElementById('k_dscr').textContent = fmt(s.min_dscr, 2);
@@ -343,7 +353,7 @@ for (const btn of document.querySelectorAll('.tab-btn')) {{
   }});
 }}
 
-for (const id of ['load_scn','queue_scn','tight_scn','capex','opex','wacc','debt','ppa','degrade']) {{
+for (const id of ['load_scn','queue_scn','tight_scn','contract_type','capex','opex','wacc','debt','ppa','degrade']) {{
   document.getElementById(id).addEventListener('input', refresh);
 }}
 refresh();
