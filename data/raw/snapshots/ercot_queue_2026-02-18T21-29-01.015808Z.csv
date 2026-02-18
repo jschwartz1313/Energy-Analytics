@@ -1,0 +1,13 @@
+queue_id,project_name,technology_raw,mw,status_raw,queue_date,target_cod,bus,county
+Q-1001,Lone Star Solar I,Solar PV,220,Submitted,2023-06-11,2027-05-01,Bus-A,Travis
+Q-1002,Panhandle Wind Alpha,Wind,180,Active,2022-09-20,2026-11-01,Bus-B,Gray
+Q-1003,Houston Battery Hub,BESS,125,In Study,2024-01-15,2028-08-01,Bus-C,Harris
+Q-1004,West TX Solar II,Solar,300,Under Construction,2021-03-18,2026-06-01,Bus-D,Reeves
+Q-1005,Gulf Coast Wind Beta,Wind,210,Withdrawn,2020-02-08,2025-10-01,Bus-E,Matagorda
+Q-1006,Permian Storage Node,Storage,90,Suspended,2022-07-29,2027-12-01,Bus-F,Midland
+Q-1007,North ERCOT Solar III,Solar PV,260,Operational,2019-04-14,2024-09-01,Bus-G,Wise
+Q-1008,Rio Grande Wind III,Wind,140,Cancelled,2018-05-09,2024-03-01,Bus-H,Starr
+Q-1009,Dallas Flex Storage,Battery,110,Active,2023-02-19,2029-04-01,Bus-I,Dallas
+Q-1010,Central TX Solar IV,Solar,175,Submitted,2024-06-03,2030-02-01,Bus-J,McLennan
+Q-1011,South Plains Wind Delta,Wind,160,Operational,2019-10-22,2025-07-01,Bus-K,Lubbock
+Q-1012,Corpus Christi Storage,BESS,95,Withdrawn,2021-11-10,2025-12-01,Bus-L,Nueces

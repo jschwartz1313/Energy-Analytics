@@ -144,3 +144,23 @@
 [2026-02-18T21:22:40.432903Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg reports/charts/ercot_load_forecast_scenarios.svg
 [2026-02-18T21:22:40.534895Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
 [2026-02-18T21:22:40.633173Z] qa:rows=72 failures=0 report=reports/qa_report.md
+[2026-02-18T21:29:01.011148Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:29:01.013170Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:29:01.014207Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:29:01.016201Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:29:01.016591Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:29:01.016698Z] ingest complete region=ERCOT mode=sample
+[2026-02-18T21:29:01.116080Z] transform:panel rows=72 staged=data/staged/ercot_hourly_panel_staged.csv curated=data/curated/ercot_hourly_panel.csv
+[2026-02-18T21:29:01.220176Z] forecast:backtest_rows=48 naive_rmse=0.00 weather_rmse=1799.04
+[2026-02-18T21:29:01.322035Z] queue_transform:normalized_rows=12 outlook_rows=11 calibration_rows=3 empirical_tech_rates={'wind': 0.3333}
+[2026-02-18T21:29:01.423759Z] markets:hours=72 solar_capture=36.460 wind_capture=36.729 negative_hours=0
+[2026-02-18T21:29:01.537485Z] finance:scenarios=18 base_npv_musd=-32.045 base_after_tax_npv_musd=-35.533 base_irr=0.006
+[2026-02-18T21:29:01.642977Z] charts:created reports/charts/ercot_load.svg reports/charts/ercot_price.svg reports/charts/ercot_temperature.svg reports/charts/ercot_queue_expected_online_mw.svg reports/charts/ercot_load_forecast_scenarios.svg
+[2026-02-18T21:29:01.770726Z] dashboard:generated dashboard=reports/dashboard/index.html summary=reports/dashboard/summary_report.html
+[2026-02-18T21:29:01.875652Z] qa:rows=72 failures=0 report=reports/qa_report.md
+[2026-02-18T21:29:02.026925Z] ingest:load mode=sample source_type=sample source_ref=data/samples/ercot_load_sample.csv rows=72 bytes=2405 sha256=e33ec06a9c04
+[2026-02-18T21:29:02.028000Z] ingest:price mode=sample source_type=sample source_ref=data/samples/ercot_price_sample.csv rows=72 bytes=3063 sha256=3ed02848809a
+[2026-02-18T21:29:02.029023Z] ingest:weather mode=sample source_type=sample source_ref=data/samples/ercot_weather_sample.csv rows=72 bytes=2339 sha256=a8293968180b
+[2026-02-18T21:29:02.031676Z] ingest:queue mode=sample source_type=sample source_ref=data/samples/ercot_queue_sample.csv rows=12 bytes=1085 sha256=d6c3f74e6316
+[2026-02-18T21:29:02.032111Z] ingest_manifest:path=reports/ingestion_manifest.json records=4
+[2026-02-18T21:29:02.032224Z] ingest complete region=ERCOT mode=sample
